@@ -1,0 +1,50 @@
+[
+  {
+    "ParameterKey": "BitbucketSecret",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "BitbucketServerUrl",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "BitbucketToken",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "EndpointType",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "LBSubnets",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "LBSSLCertificateArn",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "LBCIDR",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "LambdaSubnets",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "S3BucketCodePipelineName",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "VPCID",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "WebProxyHost",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "WebProxyPort",
+    "ParameterValue": ""
+  }
+]

@@ -1,0 +1,281 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CodePipeline integration with the Bitbucket Server
+Parameters:
+  BitbucketSecret:
+    Type: String
+    Description: Bitbucket webhook secret used to sign webhook events. You should
+      define the secret and use the same value here and in the Bitbucket server webhook.
+    NoEcho: true
+  BitbucketServerUrl:
+    Type: String
+    Description: URL of your Bitbucket Server e.g. http://server:port
+  BitbucketToken:
+    Type: String
+    Description: Personal token generated to access the repositories
+    NoEcho: true
+  EndpointType:
+    Type: String
+    Description: Select the type of endpoint to integrate with the Lambda Function
+    AllowedValues:
+    - API Gateway
+    - Application Load Balancer
+  LBCIDR:
+    Type: String
+    Description: CIDR allowed to communicate with the Load Balancer. It should allow
+      the Bitbucket server IP address. Leave it blank if you are using the API Gateway
+      endpoint type.
+  LBSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnets where the Application Load Balancer run. Leave it blank if
+      you are using the API Gateway endpoint type.
+  LBSSLCertificateArn:
+    Type: String
+    Description: SSL Certificate to associate with the Application Load Balancer.
+      Leave it blank if you are using the API Gateway endpoint type.
+  LambdaSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnets where the Lambda Function run
+  S3BucketCodePipelineName:
+    Type: String
+    Description: S3 bucket name to store the Bitbucket repository content
+    AllowedPattern: ^[a-z]*$
+    ConstraintDescription: This field should contain only lower case characters
+  VPCID:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID where the Application Load Balancer and the Lambda function
+      run
+  WebProxyHost:
+    Type: String
+    Description: Hostname of your Proxy server used by the Lambda Function to access
+      the Bitbucket server. If you don't need a web proxy leave it blank. e.g. myproxy.mydomain.com
+  WebProxyPort:
+    Type: String
+    Description: Port of your Proxy server used by the Lambda Function to access the
+      Bitbucket server. If you don't need a web proxy leave it blank. e.g. 8080
+Conditions:
+  EndpointTypeALB:
+    Fn::Equals:
+    - Ref: EndpointType
+    - Application Load Balancer
+  EndpointTypeAPIGW:
+    Fn::Equals:
+    - Ref: EndpointType
+    - API Gateway
+Resources:
+  S3BucketCodePipeline:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Ref: S3BucketCodePipelineName
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+  KMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: CMK used by the Lambda Function to encrypt the environment variables
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id: root
+        Statement:
+        - Sid: Enable IAM User Permissions
+          Effect: Allow
+          Principal:
+            AWS:
+              Fn::Sub: arn:aws:iam::${AWS::AccountId}:root
+          Action: kms:*
+          Resource: '*'
+  IamPolicyLambdaFunction:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: AWS CodePipeline integration with BitBucket Server
+      ManagedPolicyName: CodePipeline-Bitbucket-Integration
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:PutObject
+          Resource:
+          - Fn::Sub: arn:aws:s3:::${S3BucketCodePipeline}
+          - Fn::Sub: arn:aws:s3:::${S3BucketCodePipeline}/*
+        - Effect: Allow
+          Action:
+          - kms:decrypt
+          Resource:
+          - Fn::GetAtt:
+            - KMSKey
+            - Arn
+  IamRoleLambdaFunction:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - Ref: IamPolicyLambdaFunction
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      RoleName: CodePipeline-Bitbucket-Integration
+  SgLambdaFunction:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG used by the Bitbucket Integration Lambda Function
+      GroupName: CodePipeline-Bitbucket-Integration-Lambda
+      VpcId:
+        Ref: VPCID
+  SgAlb:
+    Type: AWS::EC2::SecurityGroup
+    Condition: EndpointTypeALB
+    Properties:
+      GroupDescription: SG used by the Bitbucket Integration ALB
+      GroupName: CodePipeline-Bitbucket-Integration-ALB
+      SecurityGroupIngress:
+      - CidrIp:
+          Ref: LBCIDR
+        Description: Range of IP allowed to connect to the Load Balancer
+        FromPort: 443
+        ToPort: 443
+        IpProtocol: tcp
+      VpcId:
+        Ref: VPCID
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: CodePipeline-Bitbucket-Integration
+      Environment:
+        Variables:
+          BITBUCKET_SERVER_URL:
+            Ref: BitbucketServerUrl
+          BITBUCKET_TOKEN:
+            Ref: BitbucketToken
+          BITBUCKET_SECRET:
+            Ref: BitbucketSecret
+          S3BUCKET:
+            Ref: S3BucketCodePipeline
+          WEBPROXY_HOST:
+            Ref: WebProxyHost
+          WEBPROXY_PORT:
+            Ref: WebProxyPort
+      Handler: index.handler
+      KmsKeyArn:
+        Fn::GetAtt:
+        - KMSKey
+        - Arn
+      Role:
+        Fn::GetAtt:
+        - IamRoleLambdaFunction
+        - Arn
+      Code:
+        S3Bucket: lexlabs3bucketmgmtapps
+        S3Key: f4a779b4953357ca1517a6a0e76994f4
+      Runtime: nodejs10.x
+      Timeout: '30'
+      VpcConfig:
+        SecurityGroupIds:
+        - Ref: SgLambdaFunction
+        SubnetIds:
+          Ref: LambdaSubnets
+  LambdaPermissionAlb:
+    Type: AWS::Lambda::Permission
+    Condition: EndpointTypeALB
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Ref: LambdaFunction
+      Principal: elasticloadbalancing.amazonaws.com
+  LambdaPermissionAPIGw:
+    Type: AWS::Lambda::Permission
+    Condition: EndpointTypeAPIGW
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Ref: LambdaFunction
+      Principal: apigateway.amazonaws.com
+  Alb:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Condition: EndpointTypeALB
+    Properties:
+      Name: cp-bitbucket-int
+      Scheme: internet-facing
+      SecurityGroups:
+      - Ref: SgAlb
+      Subnets:
+        Ref: LBSubnets
+      IpAddressType: ipv4
+  AlbListener443:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: EndpointTypeALB
+    Properties:
+      DefaultActions:
+      - TargetGroupArn:
+          Ref: TargetGroup
+        Type: forward
+      LoadBalancerArn:
+        Ref: Alb
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+      - CertificateArn:
+          Ref: LBSSLCertificateArn
+  TargetGroup:
+    DependsOn: LambdaPermissionAlb
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Condition: EndpointTypeALB
+    Properties:
+      TargetType: lambda
+      Name: cp-bitbucket-int
+      Targets:
+      - Id:
+          Fn::GetAtt:
+          - LambdaFunction
+          - Arn
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Condition: EndpointTypeAPIGW
+    Properties:
+      Description: API used by the AWS CodePipeline integration with the Bitbucket
+        Server
+      EndpointConfiguration:
+        Types:
+        - REGIONAL
+      Name: CodePipeline-Bitbucket-Integration
+  RestApiMethod:
+    Type: AWS::ApiGateway::Method
+    Condition: EndpointTypeAPIGW
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
+      ResourceId:
+        Fn::GetAtt:
+        - RestApi
+        - RootResourceId
+      RestApiId:
+        Ref: RestApi
+  RestApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Condition: EndpointTypeAPIGW
+    DependsOn: RestApiMethod
+    Properties:
+      Description: Stage Deployment
+      RestApiId:
+        Ref: RestApi
+      StageName: prod
+Outputs:
+  EndpointUrlAlb:
+    Condition: EndpointTypeALB
+    Value:
+      Fn::GetAtt:
+      - Alb
+      - DNSName

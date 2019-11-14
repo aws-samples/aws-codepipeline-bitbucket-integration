@@ -1,0 +1,11 @@
+{
+    "name": "awscodepipeline-bitbucket-integration",
+    "version": "0.1.0",
+    "description": "Integrates AWS CodePipeline with a Bitbucket Server",
+    "main": "index.js",
+    "author": "Alex Rosa <alexros@amazon.com>",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "axios": "^0.18.0"
+    }
+}

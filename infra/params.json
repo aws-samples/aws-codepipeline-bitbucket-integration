@@ -1,0 +1,50 @@
+[
+  {
+    "ParameterKey": "BitbucketSecret",
+    "ParameterValue": "ximbica"
+  },
+  {
+    "ParameterKey": "BitbucketServerUrl",
+    "ParameterValue": "http://3.227.61.246:7990"
+  },
+  {
+    "ParameterKey": "BitbucketToken",
+    "ParameterValue": "NzY3NDEwMzE4NTMyOkV6PgWePjQlsXsHKBToQMkQOLzi"
+  },
+  {
+    "ParameterKey": "EndpointType",
+    "ParameterValue": "API Gateway"
+  },
+  {
+    "ParameterKey": "LBSubnets",
+    "ParameterValue": "subnet-82b98fca,subnet-d5c05cf9"
+  },
+  {
+    "ParameterKey": "LBSSLCertificateArn",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "LBCIDR",
+    "ParameterValue": "3.227.61.246/32"
+  },
+  {
+    "ParameterKey": "LambdaSubnets",
+    "ParameterValue": "subnet-48c15d64,subnet-33bb8d7b"
+  },
+  {
+    "ParameterKey": "S3BucketCodePipelineName",
+    "ParameterValue": "awscpbitbucketintegrationb"
+  },
+  {
+    "ParameterKey": "VPCID",
+    "ParameterValue": "vpc-3c2c4b45"
+  },
+  {
+    "ParameterKey": "WebProxyHost",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "WebProxyPort",
+    "ParameterValue": ""
+  }
+]
