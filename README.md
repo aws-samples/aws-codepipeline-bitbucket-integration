@@ -11,7 +11,7 @@ Some security protection are available with this solution.
 ## Overview
 The figure below shows how the integration works. During the creation of the CloudFormation stack, you can select using API Gateway or ELB to communicate with the Lambda Function.
 
-![Solution Diagram](https://code.amazon.com/packages/Awscodepipeline-bitbucket-integration/blobs/mainline/--/assets/diagram.png?raw=1)
+![Solution Diagram](assets/diagram.png)
 
 1. The user pushes code to the Bitbucket repository. 
 1. Based on that user action, the Bitbucket server generates a new webhook event and send it to the ELB or API Gateway, based on which endpoint type you selected during the CloudFormation stack creation.
