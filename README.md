@@ -80,7 +80,7 @@ WebProxyPort | Port of your Proxy server used by the Lambda Function to access t
 
 #### Create the CloudFormation stack
 ```bash
-aws cloudformation create-stack --stack-name CodePipeline-Bitbucket-Integration --template-body file:///package.yaml --parameters file:///infra/parameters.json --capabilities CAPABILITY_NAMED_IAM
+aws cloudformation create-stack --stack-name CodePipeline-Bitbucket-Integration --template-body file://package.yaml --parameters file://infra/parameters.json --capabilities CAPABILITY_NAMED_IAM
 ```
 
 ### Create a webhook on the Bitbucket Server
