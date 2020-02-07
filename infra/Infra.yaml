@@ -262,3 +262,7 @@ Outputs:
       Fn::GetAtt:
       - Alb
       - DNSName
+  EndpointUrlApiGw:
+    Condition: EndpointTypeAPIGW
+    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+
