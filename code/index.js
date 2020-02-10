@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const axios = require('axios');
+const axios = require('./node_modules/axios');
 const s3 = new AWS.S3();
 const crypto = require('crypto');
 

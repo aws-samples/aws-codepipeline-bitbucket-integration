@@ -22,29 +22,34 @@ Parameters:
       - API Gateway
       - Application Load Balancer
   LBCIDR:
+    Default: ''
     Type: String
     Description: CIDR allowed to communicate with the Load Balancer. It should allow the Bitbucket server IP address. Leave it blank if you are using the API Gateway endpoint type.
   LBSubnets:
-    Type: List<AWS::EC2::Subnet::Id>
+    Default: ''
+    Type: String
     Description: Subnets where the Application Load Balancer run. Leave it blank if you are using the API Gateway endpoint type.
   LBSSLCertificateArn:
+    Default: ''
     Type: String
     Description: SSL Certificate to associate with the Application Load Balancer. Leave it blank if you are using the API Gateway endpoint type.
   LambdaSubnets:
-    Type: List<AWS::EC2::Subnet::Id>
+    Type: String
     Description: Subnets where the Lambda Function run
   S3BucketCodePipelineName:
     Type: String 
     Description: S3 bucket name to store the Bitbucket repository content
-    AllowedPattern: '^[a-z]*$'
-    ConstraintDescription: This field should contain only lower case characters
+    AllowedPattern: ^[0-9a-z]+([0-9a-z-]*[0-9a-z])*$
+    ConstraintDescription: This field should contain only lower case characters, numbers, and hyphens
   VPCID:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID where the Application Load Balancer and the Lambda function run
   WebProxyHost:
+    Default: ''
     Type: String
     Description: Hostname of your Proxy server used by the Lambda Function to access the Bitbucket server. If you don't need a web proxy leave it blank. e.g. myproxy.mydomain.com
   WebProxyPort:
+    Default: ''
     Type: String
     Description: Port of your Proxy server used by the Lambda Function to access the Bitbucket server. If you don't need a web proxy leave it blank. e.g. 8080
 
@@ -164,7 +169,7 @@ Resources:
       VpcConfig:
         SecurityGroupIds:
         - Ref: SgLambdaFunction
-        SubnetIds: !Ref LambdaSubnets
+        SubnetIds: !Split [ ',', !Ref LambdaSubnets ]
 
   LambdaPermissionAlb:
     Type: AWS::Lambda::Permission
@@ -192,7 +197,7 @@ Resources:
       Scheme: internet-facing
       SecurityGroups:
       - Ref: SgAlb
-      Subnets: !Ref LBSubnets
+      Subnets: !Split [ ',', !Ref LBSubnets ]
       IpAddressType: ipv4
 
   AlbListener443:
@@ -213,7 +218,7 @@ Resources:
 
   TargetGroup:
     DependsOn: LambdaPermissionAlb
-    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Condition: EndpointTypeALB
     Properties:
       TargetType: lambda
@@ -262,3 +267,6 @@ Outputs:
       Fn::GetAtt:
       - Alb
       - DNSName
+  EndpointUrlAPIGW:
+    Condition: EndpointTypeAPIGW
+    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
