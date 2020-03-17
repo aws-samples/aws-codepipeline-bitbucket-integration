@@ -42,7 +42,7 @@ In this step, you upload the Lambda Function and Lambda Layer zip files to an S3
 
 #### Clone the Git repository containing the solution source code
 ```bash
-git clone https://github.com/awslabs/awscodepipeline-integration-bitbucket.git
+git clone https://github.com/aws-samples/aws-codepipeline-bitbucket-integration.git
 ```
 
 #### Install the NodeJS packages with npm
