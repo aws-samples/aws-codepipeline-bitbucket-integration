@@ -175,7 +175,7 @@ Resources:
       Code:
         S3Bucket: lexlabs3bucketmgmtapps
         S3Key: f4a779b4953357ca1517a6a0e76994f4
-      Runtime: nodejs10.x
+      Runtime: nodejs14.x
       Timeout: '30'
       VpcConfig:
         SecurityGroupIds:
