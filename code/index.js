@@ -1,70 +1,9 @@
-const AWS = require('aws-sdk');
-const axios = require('axios');
-const s3 = new AWS.S3();
-const crypto = require('crypto');
+import {S3Client, PutObjectCommand} from "@aws-sdk/client-s3"
+import axios from "axios"
+import crypto from 'node:crypto';
 
-exports.handler = async (event) => {
-
-    try {
-        console.log(`Incoming event: ${JSON.stringify(event)}`);
-        const eventBody = JSON.parse(event.body);
-
-        // Normalize headers
-        const normalizedHeaders = normalizeObject(event.headers);
-
-        // Respond to test event
-        if ('x-event-key' in normalizedHeaders && normalizedHeaders['x-event-key'] === 'diagnostics:ping') {
-            return responseToApiGw(200, 'Webhook configured successfully');
-        }
-
-        // Validate message signature
-        if (!(checkSignature(process.env.BITBUCKET_SECRET, normalizedHeaders['x-hub-signature'], event.body))) {
-            console.log('Invalid webhook message signature');
-            return responseToApiGw(401, 'Signature is not valid');
-        }
-        console.log('Signature validated successfully');
-
-        if (!(eventBody.changes[0].ref.type === 'BRANCH')) {
-            console.log('Invalid event type');
-            throw new Error('Invalid event type');
-        }
-
-        const repoConfig = {
-            serverUrl: process.env.BITBUCKET_SERVER_URL,
-            projectName: eventBody.repository.project.key,
-            repoName: eventBody.repository.name,
-            branch: eventBody.changes[0].ref.displayId,
-            token: process.env.BITBUCKET_TOKEN
-        };
-
-        let proxy;
-        if (process.env.WEBPROXY_HOST && process.env.WEBPROXY_PORT) {
-            proxy = {
-                host: process.env.WEBPROXY_HOST,
-                port: process.env.WEBPROXY_PORT
-            };
-        }
-
-        // Download the repository package from Bitbucket Server
-        const file = await downloadFile(repoConfig, proxy);
-
-        // Upload the repository package to S3 bucket
-        const s3Upload = await s3.upload({
-            Bucket: process.env.S3BUCKET,
-            ServerSideEncryption: 'AES256',
-            Key: `${repoConfig.projectName}/${repoConfig.repoName}/${repoConfig.branch}.zip`,
-            Body: file
-        }).promise();
-        console.log(s3Upload);
-
-        console.log('Exiting successfully');
-        return responseToApiGw(200, 'success');
-    }
-    catch (err) {
-        console.log('Exiting with error', err);
-        return responseToApiGw(500, 'Some weird thing happened');
-    }
-};
+// Initialize S3 client
+const s3Client = new S3Client();
 
 /**
  * Convert an object keys to lowercase
@@ -179,4 +118,70 @@ function responseToApiGw(statusCode, detail) {
         }
     };
     return response;
+}
+
+exports.handler = async (event) => {
+    try {
+        console.log(`Incoming event: ${JSON.stringify(event)}`);
+        const eventBody = JSON.parse(event.body);
+
+        // Normalize headers
+        const normalizedHeaders = normalizeObject(event.headers);
+
+        // Respond to test event
+        if ('x-event-key' in normalizedHeaders && normalizedHeaders['x-event-key'] === 'diagnostics:ping') {
+            return responseToApiGw(200, 'Webhook configured successfully');
+        }
+
+        // Validate message signature
+        if (!(checkSignature(process.env.BITBUCKET_SECRET, normalizedHeaders['x-hub-signature'], event.body))) {
+            console.log('Invalid webhook message signature');
+            return responseToApiGw(401, 'Signature is not valid');
+        }
+        console.log('Signature validated successfully');
+
+        if (!(eventBody.changes[0].ref.type === 'BRANCH')) {
+            console.log('Invalid event type');
+            throw new Error('Invalid event type');
+        }
+
+        const repoConfig = {
+            serverUrl: process.env.BITBUCKET_SERVER_URL,
+            projectName: eventBody.repository.project.key,
+            repoName: eventBody.repository.name,
+            branch: eventBody.changes[0].ref.displayId,
+            token: process.env.BITBUCKET_TOKEN
+        };
+
+        let proxy;
+        if (process.env.WEBPROXY_HOST && process.env.WEBPROXY_PORT) {
+            proxy = {
+                host: process.env.WEBPROXY_HOST,
+                port: process.env.WEBPROXY_PORT
+            };
+        }
+
+        // Download the repository package from Bitbucket Server
+        const file = await downloadFile(repoConfig, proxy);
+
+        // Create a PutObjectCommand with the zipped repository package key and file
+        const uploadCommand = new PutObjectCommand({
+            Bucket: process.env.S3BUCKET,
+            Key: `${repoConfig.projectName}/${repoConfig.repoName}/${repoConfig.branch}.zip`,
+            Body: file,
+            ServerSideEncryption: "AES256"
+        });
+
+        // Upload the repository package to S3 bucket
+        await s3Client.send(uploadCommand).promise();
+
+        console.log(s3Upload);
+
+        console.log('Exiting successfully');
+        return responseToApiGw(200, 'success');
+    }
+    catch (err) {
+        console.log('Exiting with error', err);
+        return responseToApiGw(500, 'Some weird thing happened');
+    }
 }
