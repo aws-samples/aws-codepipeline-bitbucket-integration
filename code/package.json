@@ -3,9 +3,10 @@
     "version": "0.1.0",
     "description": "Integrates AWS CodePipeline with a Bitbucket Server",
     "main": "index.js",
+    "type": "module",
     "author": "Alex Rosa <alexros@amazon.com>",
     "license": "MIT",
     "dependencies": {
-        "axios": "^0.21.2"
+        "axios": "^1.6.7"
     }
 }
