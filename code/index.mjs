@@ -50,7 +50,6 @@ export const handler = async (event) => {
             
         let params = {
             Bucket: process.env.S3BUCKET,
-            ServerSideEncryption: 'AES256',
             Key: `${repoConfig.projectName}/${repoConfig.repoName}/${repoConfig.branch}.zip`,
             Body: file
         };
@@ -65,16 +64,6 @@ export const handler = async (event) => {
             params.Key
         );
 
-        // // Upload the repository package to S3 bucket
-        // const s3Upload = await s3.upload({
-        //     Bucket: process.env.S3BUCKET,
-        //     ServerSideEncryption: 'AES256',
-        //     Key: `${repoConfig.projectName}/${repoConfig.repoName}/${repoConfig.branch}.zip`,
-        //     Body: file
-        // }).promise();
- 
-        // console.log(s3Upload);
- 
         console.log('Exiting successfully');
         return responseToApiGw(200, 'success');
     }
@@ -114,7 +103,7 @@ async function downloadFile(repoConfig, proxy) {
  
     const params = {
         method: 'get',
-        responseType: 'stream',
+        responseType: 'arraybuffer',
         baseURL: repoConfig.serverUrl,
         url: `/rest/api/latest/projects/${repoConfig.projectName}/repos/${repoConfig.repoName}/archive?at=refs/heads/${repoConfig.branch}&format=zip`,
         headers: {
