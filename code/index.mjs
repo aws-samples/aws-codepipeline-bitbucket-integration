@@ -61,7 +61,7 @@ export const handler = async (event) => {
         });
     
         parallelUploads3.on("httpUploadProgress", (progress) => {
-          console.log('progress', progress);
+ 
         });
     
         await parallelUploads3.done();
