@@ -1,4 +1,5 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client } from '@aws-sdk/client-s3';
+import { Upload } from "@aws-sdk/lib-storage";
 import axios from 'axios';
 import crypto from 'crypto';
 
@@ -53,18 +54,18 @@ export const handler = async (event) => {
             Key: `${repoConfig.projectName}/${repoConfig.repoName}/${repoConfig.branch}.zip`,
             Body: file
         };
-        
-        const results = await s3.send(new PutObjectCommand(params));
-        console.log(
-            "Successfully created " +
-            params.Key +
-            " and uploaded it to " +
-            params.Bucket +
-            "/" +
-            params.Key
-        );
 
-        console.log('Exiting successfully');
+        const parallelUploads3 = new Upload({
+          client: s3,
+          params: params,
+        });
+    
+        parallelUploads3.on("httpUploadProgress", (progress) => {
+          console.log('progress', progress);
+        });
+    
+        await parallelUploads3.done();
+
         return responseToApiGw(200, 'success');
     }
     catch (err) {
@@ -100,12 +101,13 @@ function normalizeObject(inputObject) {
 */
 async function downloadFile(repoConfig, proxy) {
     console.log('info', '>>> downloadFile()');
- 
     const params = {
         method: 'get',
-        responseType: 'arraybuffer',
+        responseType: 'stream',
         baseURL: repoConfig.serverUrl,
         url: `/rest/api/latest/projects/${repoConfig.projectName}/repos/${repoConfig.repoName}/archive?at=refs/heads/${repoConfig.branch}&format=zip`,
+        url: `/rest/api/latest/projects/${repoConfig.projectName}/repos/${repoConfig.repoName}/archive?at=refs/heads/${repoConfig.branch}&format=zip`,
+
         headers: {
             Authorization: `Bearer ${repoConfig.token}`
         }
