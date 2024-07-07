@@ -106,8 +106,6 @@ async function downloadFile(repoConfig, proxy) {
         responseType: 'stream',
         baseURL: repoConfig.serverUrl,
         url: `/rest/api/latest/projects/${repoConfig.projectName}/repos/${repoConfig.repoName}/archive?at=refs/heads/${repoConfig.branch}&format=zip`,
-        url: `/rest/api/latest/projects/${repoConfig.projectName}/repos/${repoConfig.repoName}/archive?at=refs/heads/${repoConfig.branch}&format=zip`,
-
         headers: {
             Authorization: `Bearer ${repoConfig.token}`
         }
