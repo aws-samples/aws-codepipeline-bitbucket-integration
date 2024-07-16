@@ -38,7 +38,15 @@ Parameters:
   S3BucketCodePipelineName:
     Type: String
     Description: S3 bucket name to store the Bitbucket repository content
-    AllowedPattern: ^[a-z]*$
+    AllowedPattern: ^((?!xn--)(?!.*-s3alias$)[a-z0-9][a-z0-9-]{1,61}[a-z0-9])$
+    ConstraintDescription: This field should contain only lower case characters
+  S3BucketRegion:
+    Type: String
+    Description: S3 bucket region
+  LambdaS3Bucket:
+    Type: String
+    Description: S3 bucket name which stores code for Lambda function
+    AllowedPattern: ^((?!xn--)(?!.*-s3alias$)[a-z0-9][a-z0-9-]{1,61}[a-z0-9])$
     ConstraintDescription: This field should contain only lower case characters
   VPCID:
     Type: AWS::EC2::VPC::Id
@@ -163,6 +171,8 @@ Resources:
             Ref: WebProxyHost
           WEBPROXY_PORT:
             Ref: WebProxyPort
+          S3_BUCKET_REGION:
+            Ref: S3BucketRegion
       Handler: index.handler
       KmsKeyArn:
         Fn::GetAtt:
@@ -173,9 +183,10 @@ Resources:
         - IamRoleLambdaFunction
         - Arn
       Code:
-        S3Bucket: lexlabs3bucketmgmtapps
-        S3Key: f4a779b4953357ca1517a6a0e76994f4
-      Runtime: nodejs14.x
+        S3Bucket:
+          Ref: LambdaS3Bucket
+        S3Key: code.zip
+      Runtime: nodejs20.x
       Timeout: '30'
       VpcConfig:
         SecurityGroupIds:
@@ -279,3 +290,7 @@ Outputs:
       Fn::GetAtt:
       - Alb
       - DNSName
+  EndpointUrlApiGw:
+    Condition: EndpointTypeAPIGW
+    Value:
+      Fn::Sub: https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/
