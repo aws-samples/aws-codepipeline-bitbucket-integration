@@ -163,7 +163,7 @@ Resources:
           WEBPROXY_PORT:
             !Ref WebProxyPort
           S3_BUCKET_REGION:
-            !Ref: S3BucketRegion  
+            !Ref S3BucketRegion  
       Handler: index.handler
       KmsKeyArn: !GetAtt KMSKey.Arn
       Role:
