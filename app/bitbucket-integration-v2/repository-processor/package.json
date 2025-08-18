@@ -1,0 +1,33 @@
+{
+    "name": "bitbucket-repository-processor",
+    "version": "2.0.0",
+    "description": "AWS Lambda function for processing repository downloads and uploads",
+    "main": "index.js",
+    "type": "module",
+    "author": "Alex Rosa <alexros@amazon.com>",
+    "license": "MIT",
+    "dependencies": {
+        "@aws-sdk/client-s3": "^3.614.0",
+        "@aws-sdk/lib-storage": "^3.620.0",
+        "@aws-sdk/client-cloudwatch": "^3.614.0",
+        "@aws-sdk/client-codepipeline": "^3.614.0",
+        "@aws-sdk/s3-request-presigner": "^3.614.0",
+        "axios": "^1.6.7",
+        "pino": "^9.3.1"
+    },
+    "devDependencies": {
+        "chai": "^5.1.1",
+        "mocha": "^10.6.0",
+        "sinon": "^18.0.0",
+        "nock": "^13.5.4"
+    },
+    "scripts": {
+        "test": "mocha test/**/*.spec.js",
+        "test:watch": "mocha test/**/*.spec.js --watch",
+        "test:coverage": "nyc mocha test/**/*.spec.js",
+        "start": "node index.js"
+    },
+    "engines": {
+        "node": ">=22.0.0"
+    }
+}

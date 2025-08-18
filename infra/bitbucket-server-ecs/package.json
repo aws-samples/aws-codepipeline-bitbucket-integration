@@ -1,0 +1,43 @@
+{
+  "name": "bitbucket-server-ecs",
+  "version": "1.0.0",
+  "description": "Bitbucket Server 9.3.2 on AWS ECS Fargate",
+  "type": "module",
+  "bin": {
+    "bitbucket-server-ecs": "bin/bitbucket-ecs.js"
+  },
+  "scripts": {
+    "build": "echo 'Build completed - JavaScript files ready'",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk",
+    "deploy": "cdk deploy",
+    "destroy": "cdk destroy",
+    "diff": "cdk diff",
+    "synth": "cdk synth"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.4.0",
+    "@types/node": "18.14.6",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "aws-cdk": "2.87.0",
+    "ts-node": "^10.9.1",
+    "typescript": "~5.0.4"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.87.0",
+    "constructs": "^10.0.0"
+  },
+  "keywords": [
+    "aws",
+    "cdk",
+    "ecs",
+    "fargate",
+    "bitbucket",
+    "atlassian",
+    "container"
+  ],
+  "author": "AWS Solutions Architect",
+  "license": "MIT"
+}
