@@ -1,0 +1,51 @@
+{
+  "name": "aws-codepipeline-bitbucket-integration",
+  "version": "2.0.0",
+  "description": "AWS CodePipeline Integration with Bitbucket Server",
+  "type": "module",
+  "scripts": {
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:unit": "NODE_OPTIONS=--experimental-vm-modules jest tests/unit",
+    "test:integration": "NODE_OPTIONS=--experimental-vm-modules jest tests/integration --testTimeout=60000",
+    "test:integration:aws": "NODE_OPTIONS=--experimental-vm-modules jest tests/integration/aws-services/real-aws.test.js --testTimeout=60000",
+    "test:integration:e2e": "NODE_OPTIONS=--experimental-vm-modules jest tests/integration/end-to-end --testTimeout=120000",
+    "test:e2e:complete": "NODE_OPTIONS=--experimental-vm-modules jest tests/integration/end-to-end/complete-e2e.test.js --testTimeout=120000",
+    "test:infrastructure": "NODE_OPTIONS=--experimental-vm-modules jest tests/infrastructure",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test:ci": "NODE_OPTIONS=--experimental-vm-modules jest --ci --coverage --watchAll=false",
+    "lint": "eslint app/ tests/",
+    "lint:fix": "eslint app/ tests/ --fix",
+    "validate:aws": "node scripts/validate-aws-credentials.js"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-cloudformation": "^3.614.0",
+    "@jest/globals": "^29.7.0",
+    "aws-cdk-lib": "^2.147.0",
+    "aws-sdk-client-mock": "^4.1.0",
+    "constructs": "^10.0.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "nock": "^13.5.4",
+    "sinon": "^18.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.614.0",
+    "@aws-sdk/client-cloudwatch-logs": "^3.614.0",
+    "@aws-sdk/client-codepipeline": "^3.614.0",
+    "@aws-sdk/client-dynamodb": "^3.614.0",
+    "@aws-sdk/client-s3": "^3.614.0",
+    "@aws-sdk/client-secrets-manager": "^3.614.0",
+    "@aws-sdk/client-sqs": "^3.614.0",
+    "@aws-sdk/client-sts": "^3.864.0",
+    "@aws-sdk/lib-storage": "^3.620.0",
+    "@aws-sdk/s3-request-presigner": "^3.614.0",
+    "axios": "^1.6.7",
+    "pino": "^9.3.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "author": "Alex Rosa <alexros@amazon.com>",
+  "license": "MIT"
+}

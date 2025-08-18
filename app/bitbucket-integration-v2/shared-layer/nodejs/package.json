@@ -1,0 +1,16 @@
+{
+  "name": "bitbucket-integration-shared",
+  "version": "2.0.0",
+  "description": "Shared utilities for Bitbucket integration",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.x",
+    "@aws-sdk/client-ssm": "^3.x",
+    "@aws-sdk/client-cloudwatch": "^3.x",
+    "axios": "^1.6.7",
+    "pino": "^9.3.1"
+  }
+}

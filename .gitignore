@@ -127,3 +127,62 @@ $RECYCLE.BIN/
 
 
 # End of https://www.gitignore.io/api/osx,node,linux,windows
+
+# Bitbucket Server Installers (arquivos grandes - baixados automaticamente)
+infra/bitbucket-server/installers/*.bin
+infra/bitbucket-server/installers/atlassian-bitbucket-*
+!infra/bitbucket-server/installers/README.md
+!infra/bitbucket-server/installers/checksums.txt
+
+# CDK output directories
+**/cdk.out/
+**/cdk-outputs.json
+**/cdk-exports.json
+**/.cdk.staging/
+**/asset-output/
+**/asset-input/
+
+# CDK context
+**/cdk.context.json
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IDE - JetBrains (WebStorm, IntelliJ, etc)
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea_modules/
+
+# Deployment files
+deployment-summary*.txt
+**/deployment-artifacts/
+**/deployment-outputs/
+
+# Local configuration
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# AWS credentials and config
+.aws/
+aws-exports.js
+awsconfiguration.json
+
+# Temporary files
+.tmp/
+.temp/
+.cache/
+tmp/
+temp/
+
+# Test reports
+**/test-reports/
+**/test-results/
+
