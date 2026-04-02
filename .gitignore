@@ -186,3 +186,6 @@ temp/
 **/test-reports/
 **/test-results/
 
+
+# Kiro specs
+.kiro/

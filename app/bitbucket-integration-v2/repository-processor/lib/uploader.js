@@ -46,11 +46,11 @@ export class S3Uploader {
      * @returns {string} Sanitized component
      */
     sanitizeS3KeyComponent(component) {
-        return component
-            .replace(/[^a-zA-Z0-9\-_.]/g, '-') // Replace invalid chars with dash
-            .replace(/-+/g, '-') // Replace multiple dashes with single dash
-            .replace(/^-|-$/g, '') // Remove leading/trailing dashes
-            .toLowerCase();
+        const lower = component.toLowerCase();
+        return lower.replace(/[^a-zA-Z0-9\-_.]/g, (char) => {
+            const hex = char.charCodeAt(0).toString(16).padStart(2, '0');
+            return '~' + hex;
+        });
     }
 
     /**
