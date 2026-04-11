@@ -12,7 +12,7 @@
         "@aws-sdk/client-cloudwatch": "^3.614.0",
         "@aws-sdk/client-codepipeline": "^3.614.0",
         "@aws-sdk/s3-request-presigner": "^3.614.0",
-        "axios": "^1.6.7",
+        "axios": "^1.15.0",
         "pino": "^9.3.1"
     },
     "devDependencies": {
