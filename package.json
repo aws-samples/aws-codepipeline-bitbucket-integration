@@ -40,7 +40,7 @@
     "@aws-sdk/client-sts": "^3.1029.0",
     "@aws-sdk/lib-storage": "^3.620.0",
     "@aws-sdk/s3-request-presigner": "^3.1029.0",
-    "axios": "^1.15.0",
+    "axios": "^1.15.2",
     "pino": "^9.3.1"
   },
   "engines": {
