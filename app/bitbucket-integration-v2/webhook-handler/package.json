@@ -9,7 +9,7 @@
     "dependencies": {
         "@aws-sdk/client-sqs": "^3.1016.0",
         "@aws-sdk/client-cloudwatch": "^3.1016.0",
-        "axios": "^1.6.7",
+        "axios": "^1.15.2",
         "pino": "^9.3.1"
     },
     "devDependencies": {
