@@ -10,7 +10,7 @@
     "@aws-sdk/client-secrets-manager": "^3.x",
     "@aws-sdk/client-ssm": "^3.x",
     "@aws-sdk/client-cloudwatch": "^3.x",
-    "axios": "^1.15.0",
+    "axios": "^1.15.2",
     "pino": "^9.3.1"
   }
 }
