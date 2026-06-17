@@ -21,7 +21,7 @@
   "devDependencies": {
     "@aws-sdk/client-cloudformation": "^3.1029.0",
     "@jest/globals": "^29.7.0",
-    "aws-cdk-lib": "^2.147.0",
+    "aws-cdk-lib": "^2.246.0",
     "aws-sdk-client-mock": "^4.1.0",
     "constructs": "^10.0.0",
     "eslint": "^8.57.0",
